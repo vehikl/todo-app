@@ -1,9 +1,22 @@
-import { expect, assert } from 'chai'
+import { expect } from 'chai'
+import Todos from "./Todos";
 
-describe('This works!', () => {
-    it('should pass', () => {
-        const foo = 'bar'
-        assert.equal(foo, 'bar');
-        expect(true).to.be.true
+describe('Managing todos', () => {
+    it('adds a todo', () => {
+        const myTodos = new Todos();
+        myTodos.addTodo("Buy eggs");
+        expect(myTodos.getTodos()).to.deep.include("Buy eggs");
+    })
+
+    it('lists todos', () => {
+        const myTodos = new Todos();
+        myTodos.addTodo("Buy eggs");
+        myTodos.addTodo("Buy chicken");
+        myTodos.addTodo("Feed chicken");
+        expect(myTodos.getTodos()).to.deep.equal([
+            "Buy eggs",
+            "Buy chicken",
+            "Feed chicken"
+        ]);
     })
 })
