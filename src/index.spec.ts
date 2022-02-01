@@ -1,7 +1,9 @@
-import chai from 'chai'
+import { expect, assert } from 'chai'
 
 describe('This works!', () => {
     it('should pass', () => {
-        chai.expect(true).to.be.true
+        const foo = 'bar'
+        assert.equal(foo, 'bar');
+        expect(true).to.be.true
     })
 })
