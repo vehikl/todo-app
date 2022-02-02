@@ -1,17 +1,19 @@
 import inquirer from 'inquirer'
 import Todos from "./Todos";
 
+// https://github.com/SBoudrias/Inquirer.js#reactive-interface
+// https://github.com/SBoudrias/Inquirer.js/blob/master/packages/inquirer/examples/recursive.js
 inquirer
     .prompt([
         {
             type: 'input',
             name: 'todoValue',
-            message: "Enter you to do",
+            message: "Enter your TODO",
         },
         {
             type: 'input',
             name: 'todoList',
-            message: "2. Display TodoList",
+            message: "2. Display TODO List",
         },
     ])
     .then((answers) => {
