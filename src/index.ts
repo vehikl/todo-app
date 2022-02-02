@@ -5,28 +5,51 @@ import Todos from "./Todos";
 // https://github.com/SBoudrias/Inquirer.js/blob/master/packages/inquirer/examples/recursive.js
 const questions = [
     {
-        type: 'input',
-        name: 'todoValue',
-        message: "Enter your TODO",
+        type: 'list',
+        name: 'todoOptions',
+        message: 'Choose an Option:',
+        choices: ['List your TODOs', 'Add to your TODOs', 'Quit'],
     },
     {
         type: 'input',
-        name: 'todoList',
-        message: "2. Display TODO List",
+        name: 'addAnotherTodo',
+        message: "Enter another TODO? (Y/n)",
+        when: function( answers: any ) {
+            // Only run if user answered Pizza to the first prompt
+            return answers.todoOptions === "Add to your TODOs"
+        }
     },
 ];
 
-(async () => {
-    try {
+const mytodos = new Todos();
 
-        const answers = await inquirer.prompt(questions)
-        const mytodos = new Todos();
-        mytodos.addTodo(answers.todoValue);
-    
-        if (answers.todolist === 'yes') {
-            console.log(mytodos.getTodos());
-        } else {
-            console.log('bye bye then');
+const run = async () => {
+    try {
+        const answers = await inquirer.prompt(questions);
+
+        
+        switch (answers.todoOptions) {
+            case 'List your TODOs':
+                console.log(mytodos.getTodos());
+                break;
+            // case 'Add to your TODOs':
+            //     inquirer.next(
+            //         {
+            //             type: 'input',
+            //             name: 'todoValue',
+            //             message: "Enter your TODO",
+            //     });
+            //     mytodos.addTodo(answers.todoValue);
+            //     break;
+            // default:
+            //     console.log('bye bye then');
+            //     process.abort();
+                
+        }
+
+        if (answers.addAnotherTodo === 'Y') {
+            console.log('taco', answers.addAnotherTodo)
+            mytodos.addTodo(answers.addAnotherTodo);
         }
     }
     catch(error: any) {
@@ -36,4 +59,6 @@ const questions = [
             // Something else went wrong
         }
     }
-})()
+}
+
+run()
