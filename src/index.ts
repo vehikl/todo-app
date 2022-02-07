@@ -23,8 +23,6 @@ const questions: inquirer.QuestionCollection<any> = [
     }
 ]
 
-inquirer.ui.Prompt
-
 const run = async () => {
     try {
         const answers = await inquirer.prompt(questions)
