@@ -1,63 +1,51 @@
 import inquirer from 'inquirer'
-import Todos from "./Todos";
+import Todos from './Todos'
+
+const mytodos = new Todos()
 
 // https://github.com/SBoudrias/Inquirer.js#reactive-interface
 // https://github.com/SBoudrias/Inquirer.js/blob/master/packages/inquirer/examples/recursive.js
-const questions = [
+const questions: inquirer.QuestionCollection<any> = [
     {
-        type: 'list',
+        type: 'rawlist',
         name: 'todoOptions',
         message: 'Choose an Option:',
-        choices: ['List your TODOs', 'Add to your TODOs', 'Quit'],
+        choices: ['Create a TODO', 'List your TODOs', 'Quit'],
     },
     {
         type: 'input',
-        name: 'addAnotherTodo',
-        message: "Enter another TODO? (Y/n)",
-        when: function( answers: any ) {
-            // Only run if user answered Pizza to the first prompt
-            return answers.todoOptions === "Add to your TODOs"
+        name: 'createTodo',
+        message: 'Enter your TODO:',
+        when (answers: any) {
+            // Only run if user answered 'Create a TODO' to the first prompt
+            return answers.todoOptions === 'Create a TODO'
         }
-    },
-];
+    }
+]
 
-const mytodos = new Todos();
+inquirer.ui.Prompt
 
 const run = async () => {
     try {
-        const answers = await inquirer.prompt(questions);
-
+        const answers = await inquirer.prompt(questions)
         
         switch (answers.todoOptions) {
             case 'List your TODOs':
-                console.log(mytodos.getTodos());
-                break;
-            // case 'Add to your TODOs':
-            //     inquirer.next(
-            //         {
-            //             type: 'input',
-            //             name: 'todoValue',
-            //             message: "Enter your TODO",
-            //     });
-            //     mytodos.addTodo(answers.todoValue);
-            //     break;
-            // default:
-            //     console.log('bye bye then');
-            //     process.abort();
-                
-        }
-
-        if (answers.addAnotherTodo === 'Y') {
-            console.log('taco', answers.addAnotherTodo)
-            mytodos.addTodo(answers.addAnotherTodo);
+                mytodos.getTodos().map((todo, index) => {
+                    console.log(`${index + 1}) ${todo}`)
+                })
+                run()
+                return
+            case 'Create a TODO':
+                mytodos.addTodo(answers.createTodo)
+                run()
+                return
+            default:
+                console.log('Bye bye then!')   
         }
     }
     catch(error: any) {
-        if (error.isTtyError) {
-            // Prompt couldn't be rendered in the current environment
-        } else {
-            // Something else went wrong
-        }
+        console.log(error)
     }
 }
 
