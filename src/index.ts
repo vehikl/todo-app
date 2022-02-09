@@ -3,48 +3,88 @@ import Todos from './Todos'
 
 const mytodos = new Todos()
 
-// https://github.com/SBoudrias/Inquirer.js#reactive-interface
-// https://github.com/SBoudrias/Inquirer.js/blob/master/packages/inquirer/examples/recursive.js
+const todos = () => {
+    return mytodos.getTodos()
+}
+
 const questions: inquirer.QuestionCollection<any> = [
     {
         type: 'rawlist',
         name: 'todoOptions',
         message: 'Choose an Option:',
-        choices: ['Create a TODO', 'List your TODOs', 'Quit'],
+        choices: ['CREATE', 'READ', 'Quit'],
     },
     {
         type: 'input',
         name: 'createTodo',
         message: 'Enter your TODO:',
-        when (answers: any) {
-            // Only run if user answered 'Create a TODO' to the first prompt
-            return answers.todoOptions === 'Create a TODO'
+        when(answers: any) {
+            return answers.todoOptions === 'CREATE'
         }
-    }
+    },
+    {
+        type: 'rawlist',
+        name: 'todo',
+        message: 'Your TODOs:',
+        choices: todos,
+        when(answers: any) {
+            return answers.todoOptions === 'READ'
+        }
+    },
+    {
+        type: 'rawlist',
+        name: 'todoAction',
+        message: 'Enter your somnething:',
+        choices: ['UPDATE', 'DELETE', 'Continue'],
+        when(answers: any) {
+            return mytodos.getTodos().includes(answers.todo)
+        }
+    },
+    {
+        type: 'input',
+        name: 'newTodo',
+        message: 'Enter your updated TODO:',
+        when(answers: any) {
+            return answers.todoAction === 'UPDATE'
+        }
+    },
 ]
 
 const run = async () => {
     try {
         const answers = await inquirer.prompt(questions)
-        
+
         switch (answers.todoOptions) {
-            case 'List your TODOs':
-                mytodos.getTodos().map((todo, index) => {
-                    console.log(`${index + 1}) ${todo}`)
-                })
-                run()
-                return
-            case 'Create a TODO':
-                mytodos.addTodo(answers.createTodo)
-                run()
-                return
-            default:
-                console.log('Bye bye then!')   
+            case 'CREATE':
+                if (answers.createTodo) {
+                    mytodos.addTodo(answers.createTodo)
+                }
+                break
+            case 'Quit':
+                console.log('Bye bye then!')
+                process.exit()
+        }
+
+        switch (answers.todoAction) {
+            case 'UPDATE':
+                if (answers.todo && answers.newTodo) {
+                    mytodos.updateTodo(answers.todo, answers.newTodo)
+                }
+                break
+            case 'DELETE':
+                if (mytodos.getTodos().indexOf(answers.todo)) {
+                    mytodos.deleteTodo(answers.todo)
+                }
+                break
         }
     }
-    catch(error: any) {
+    catch (error: any) {
         console.log(error)
     }
 }
 
-run()
+(async () => {
+    while (true) {
+        await run()
+    }
+})()

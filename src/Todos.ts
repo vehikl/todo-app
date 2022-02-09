@@ -1,11 +1,19 @@
 export default class Todos {
-    list: string[] = [];
+    private list: string[] = [];
 
-    getTodos() {
+    public getTodos(): string[] {
         return this.list;
     }
 
-    addTodo(todo: string) {
+    public addTodo(todo: string) {
         this.list.push(todo);
+    }
+
+    public updateTodo(oldTodo: string, newTodo: string) {
+        this.list[this.list.indexOf(oldTodo)] = newTodo
+    }
+
+    public deleteTodo(todo: string) {
+        this.list.splice(this.list.indexOf(todo), 1)
     }
 }
