@@ -1,7 +1,17 @@
 import inquirer from 'inquirer'
+
 import Todos from './Todos'
 
 const mytodos = new Todos()
+
+enum Operation {
+    Create = 'CREATE',
+    Read = 'READ',
+    Update = 'UPDATE',
+    Delete = 'DELETE',
+    Quit = 'QUIT',
+    Continue = 'CONTINUE'
+}
 
 const todos = () => {
     return mytodos.getTodos()
@@ -12,14 +22,14 @@ const questions: inquirer.QuestionCollection<any> = [
         type: 'rawlist',
         name: 'todoOptions',
         message: 'Choose an Option:',
-        choices: ['CREATE', 'READ', 'Quit'],
+        choices: [Operation.Create, Operation.Read, Operation.Quit],
     },
     {
         type: 'input',
         name: 'createTodo',
         message: 'Enter your TODO:',
         when(answers: any) {
-            return answers.todoOptions === 'CREATE'
+            return answers.todoOptions === Operation.Create
         }
     },
     {
@@ -28,14 +38,14 @@ const questions: inquirer.QuestionCollection<any> = [
         message: 'Your TODOs:',
         choices: todos,
         when(answers: any) {
-            return answers.todoOptions === 'READ'
+            return answers.todoOptions === Operation.Read
         }
     },
     {
         type: 'rawlist',
         name: 'todoAction',
         message: 'Enter your somnething:',
-        choices: ['UPDATE', 'DELETE', 'Continue'],
+        choices: [Operation.Update, Operation.Delete, Operation.Continue],
         when(answers: any) {
             return mytodos.getTodos().includes(answers.todo)
         }
@@ -45,7 +55,7 @@ const questions: inquirer.QuestionCollection<any> = [
         name: 'newTodo',
         message: 'Enter your updated TODO:',
         when(answers: any) {
-            return answers.todoAction === 'UPDATE'
+            return answers.todoAction === Operation.Update
         }
     },
 ]
@@ -55,23 +65,23 @@ const run = async () => {
         const answers = await inquirer.prompt(questions)
 
         switch (answers.todoOptions) {
-            case 'CREATE':
+            case Operation.Create:
                 if (answers.createTodo) {
                     mytodos.addTodo(answers.createTodo)
                 }
                 break
-            case 'Quit':
+            case Operation.Quit:
                 console.log('Bye bye then!')
                 process.exit()
         }
 
         switch (answers.todoAction) {
-            case 'UPDATE':
+            case Operation.Read:
                 if (answers.todo && answers.newTodo) {
                     mytodos.updateTodo(answers.todo, answers.newTodo)
                 }
                 break
-            case 'DELETE':
+            case Operation.Delete:
                 if (mytodos.getTodos().indexOf(answers.todo)) {
                     mytodos.deleteTodo(answers.todo)
                 }
