@@ -2,8 +2,6 @@ import inquirer from 'inquirer'
 
 import Todos from './Todos'
 
-const mytodos = new Todos()
-
 enum Operation {
     Create = 'CREATE',
     Read = 'READ',
@@ -12,6 +10,8 @@ enum Operation {
     Quit = 'QUIT',
     Continue = 'CONTINUE'
 }
+
+const mytodos = new Todos()
 
 const todos = () => {
     return mytodos.getTodos()
