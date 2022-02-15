@@ -1,5 +1,5 @@
 import {Todo} from './entity/Todo'
-import {Connection, createConnection} from "typeorm";
+import {Connection} from './Connection'
 
 export default class Todos {
     private list: string[] = [];
@@ -11,11 +11,9 @@ export default class Todos {
     public async addTodo(body: string) {
         const todo = new Todo();
         todo.body = body
-        todo.isDone = false
+        todo.isDone = false;
 
-        const connection = await createConnection()
-
-        await connection.manager.save(todo)
+        await Connection.initialize().save(todo)
     }
 
     public updateTodo(oldTodo: string, newTodo: string) {
