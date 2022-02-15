@@ -1,3 +1,6 @@
+import {Todo} from './entity/Todo'
+import {Connection, createConnection} from "typeorm";
+
 export default class Todos {
     private list: string[] = [];
 
@@ -5,8 +8,14 @@ export default class Todos {
         return this.list;
     }
 
-    public addTodo(todo: string) {
-        this.list.push(todo);
+    public async addTodo(body: string) {
+        const todo = new Todo();
+        todo.body = body
+        todo.isDone = false
+
+        const connection = await createConnection()
+
+        await connection.manager.save(todo)
     }
 
     public updateTodo(oldTodo: string, newTodo: string) {
