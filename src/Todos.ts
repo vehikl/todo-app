@@ -13,7 +13,8 @@ export default class Todos {
         todo.body = body
         todo.isDone = false;
 
-        await Connection.initialize().save(todo)
+        // TODO: might be better to abandon connection singleton and just retrive the getConnection/getRepository functions instead
+        // await Connection.initialize().save(todo)
     }
 
     public updateTodo(oldTodo: string, newTodo: string) {
