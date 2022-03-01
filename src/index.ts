@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import {createConnection} from 'typeorm';
+import {createConnection, Connection, getConnection} from 'typeorm';
 import inquirer from 'inquirer'
 
 import {User} from './entity/User';
@@ -97,6 +97,7 @@ const run = async () => {
 }
 
 (async () => {
+    const connection: Connection = await createConnection()
     while (true) {
         await run()
     }

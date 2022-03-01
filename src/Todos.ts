@@ -1,8 +1,16 @@
 import {Todo} from './entity/Todo'
-import {Connection} from './Connection'
+import {Connection, getConnection, Repository} from "typeorm";
 
 export default class Todos {
     private list: string[] = [];
+    private connection: Connection
+    private repository: Repository<Todo>
+
+
+    private async outGetConnection () {
+        this.connection = await getConnection()
+        this.repository = await this.connection.getRepository(Todo)
+    }
 
     public getTodos(): string[] {
         return this.list;
@@ -13,8 +21,15 @@ export default class Todos {
         todo.body = body
         todo.isDone = false;
 
+        await this.outGetConnection()
+        await this.repository.create({
+            body,
+            isDone: false
+        })
+
+
         // TODO: might be better to abandon connection singleton and just retrive the getConnection/getRepository functions instead
-        // await Connection.initialize().save(todo)
+        // await Connection.save(todo)
     }
 
     public updateTodo(oldTodo: string, newTodo: string) {

@@ -1,21 +1,46 @@
 import { expect } from 'chai'
 
 import Todos from './Todos'
+import { Todo } from './entity/Todo' 
+import {createConnection, Connection, getRepository, getManager} from "typeorm";
 
-describe('Managing todos', () => {
+describe('Managing todos', function () {
 
     let myTodos: Todos;
+    let connection: Connection;
+    let todoRepo
+
+    before(async function() {
+        connection = await createConnection()
+        todoRepo = await connection.getRepository(Todo)
+    })
 
     beforeEach(() => {
         myTodos = new Todos()
         myTodos.addTodo('Buy eggs')
-        myTodos.addTodo('Buy chicken')
-        myTodos.addTodo('Feed chicken')
+
     })
 
-    it('addTodo adds a todo', () => {
-        myTodos.addTodo('Eat chicken')
-        expect(myTodos.getTodos()).to.deep.include('Eat chicken')
+    it.only('addTodo adds a todo', async function () {
+        await myTodos.addTodo('Buy eggs')
+        const expectedResult = {
+            body: 'Buy eggs',
+            id: 1,
+            isDone: false,
+            createdAt: new Date()
+        }
+        
+        //our first assertion: check that the item added is not there
+        expect(connection).to.be.instanceOf(Connection)
+
+        const result = await todoRepo.findOne({where: {body: "Buy eggs" }})
+        console.log( await todoRepo.find())
+        expect(result).to.be.deep.equal(expectedResult)
+        //add item to db
+
+        //our second assertion: check that the item added is there
+        //expect: Buy eggs is in db
+
     })
 
     it('getTodos lists todos', () => {
