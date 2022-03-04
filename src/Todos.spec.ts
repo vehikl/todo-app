@@ -2,17 +2,17 @@ import { expect } from 'chai'
 
 import Todos from './Todos'
 import { Todo } from './entity/Todo'
-import { createConnection, Connection } from "typeorm";
+import { createConnection, Connection, Repository, getRepository } from "typeorm";
 
 describe('Managing todos', function () {
 
     let myTodos: Todos;
     let connection: Connection;
-    let todoRepo
+    let todoRepo: Repository<Todo>
 
     before(async function () {
-        connection = await createConnection()
-        todoRepo = await connection.getRepository(Todo)
+        // connection = await createConnection()
+        todoRepo = getRepository(Todo)
     })
 
     beforeEach(function () {
@@ -22,25 +22,13 @@ describe('Managing todos', function () {
     })
 
     it.only('addTodo adds a todo', async function () {
-        await myTodos.addTodo('Buy eggs')
-        const expectedResult = {
-            body: 'Buy eggs',
-            id: 1,
-            isDone: false,
-            createdAt: new Date()
-        }
-
-        //our first assertion: check that the item added is not there
-        expect(connection).to.be.instanceOf(Connection)
-
-        const result = await todoRepo.findOne({ where: { body: "Buy eggs" } })
-        console.log(await todoRepo.find())
-        expect(result).to.be.deep.equal(expectedResult)
-        //add item to db
-
-        //our second assertion: check that the item added is there
-        //expect: Buy eggs is in db
-
+        // const todo = await myTodos.addTodo('Buy eggs')
+        const todoEntity = todoRepo.create({
+            body: 'test',
+            isDone: false
+        })
+        const todo = await todoRepo.save(todoEntity)
+        expect(todo).to.be.instanceOf(Todo)
     })
 
     it('getTodos lists todos', function () {

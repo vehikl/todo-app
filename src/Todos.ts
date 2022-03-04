@@ -1,5 +1,5 @@
-import {Todo} from './entity/Todo'
-import {Connection, getConnection, Repository} from "typeorm";
+import { Todo } from './entity/Todo'
+import { Connection, getConnection, Repository } from "typeorm";
 import { create } from 'domain';
 import { read } from 'fs';
 
@@ -7,19 +7,16 @@ export default class Todos {
     private list: string[] = []
     private todoRepo: Repository<Todo>
 
-    constructor() {
-        this.todoRepo = getConnection().getRepository(Todo)
-    }
-
     public async getTodos(): Promise<Array<Todo>> {
         return await this.todoRepo.find()
     }
 
     public async addTodo(body: string) {
-        await this.todoRepo.create({
+        const todoEntity = this.todoRepo.create({
             body,
             isDone: false
         })
+        return await this.todoRepo.save(todoEntity)
     }
 
     public updateTodo(oldTodo: string, newTodo: string) {
