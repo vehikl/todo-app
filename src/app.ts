@@ -17,7 +17,7 @@ enum Operation {
 let mytodos: Todos
 
 const todos = () => {
-    return mytodos.getTodos()
+    return mytodos.read()
 }
 
 const questions: inquirer.QuestionCollection<any> = [
@@ -71,7 +71,7 @@ const run = async () => {
         switch (answers.todoOptions) {
             case Operation.Create:
                 if (answers.createTodo) {
-                    await mytodos.addTodo(answers.createTodo)
+                    await mytodos.create(answers.createTodo)
                 }
                 break
             case Operation.Quit:
@@ -82,7 +82,7 @@ const run = async () => {
         switch (answers.todoAction) {
             case Operation.Read:
                 if (answers.todo && answers.newTodo) {
-                    mytodos.updateTodo(answers.todo, answers.newTodo)
+                    mytodos.update(answers.todo, answers.newTodo)
                 }
                 break
             case Operation.Delete:

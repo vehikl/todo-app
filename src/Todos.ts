@@ -1,17 +1,19 @@
 import { Todo } from './entity/Todo'
-import { Connection, getConnection, Repository } from "typeorm";
-import { create } from 'domain';
-import { read } from 'fs';
+import { Connection, Repository } from "typeorm";
 
 export default class Todos {
     private list: string[] = []
     private todoRepo: Repository<Todo>
 
-    public async getTodos(): Promise<Array<Todo>> {
+    constructor(todoRepo: Repository<Todo>) {
+        this.todoRepo = todoRepo
+    }
+
+    public async read(): Promise<Todo[]> {
         return await this.todoRepo.find()
     }
 
-    public async addTodo(body: string) {
+    public async create(body: string) {
         const todoEntity = this.todoRepo.create({
             body,
             isDone: false
@@ -19,11 +21,12 @@ export default class Todos {
         return await this.todoRepo.save(todoEntity)
     }
 
-    public updateTodo(oldTodo: string, newTodo: string) {
-        this.list[this.list.indexOf(oldTodo)] = newTodo
+    public async update(oldBody: string, newBody: string) {
+        const thing = await this.todoRepo.update({ body: oldBody }, { body: newBody})
+        console.log(thing)
     }
 
-    public deleteTodo(todo: string) {
+    public delete(todo: string) {
         this.list.splice(this.list.indexOf(todo), 1)
     }
 }

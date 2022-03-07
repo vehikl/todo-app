@@ -2,57 +2,61 @@ import { expect } from 'chai'
 
 import Todos from './Todos'
 import { Todo } from './entity/Todo'
-import { createConnection, Connection, Repository, getRepository } from "typeorm";
+import { Connection, getConnection, Repository, createConnection, getRepository } from "typeorm";
 
 describe('Managing todos', function () {
 
-    let myTodos: Todos;
-    let connection: Connection;
-    let todoRepo: Repository<Todo>
-
-    before(async function () {
-        // connection = await createConnection()
-        todoRepo = getRepository(Todo)
-    })
-
     beforeEach(function () {
-        myTodos = new Todos()
-        myTodos.addTodo('Buy eggs')
-
-    })
-
-    it.only('addTodo adds a todo', async function () {
-        // const todo = await myTodos.addTodo('Buy eggs')
-        const todoEntity = todoRepo.create({
-            body: 'test',
-            isDone: false
+        return createConnection({
+            type: "sqlite",
+            database: ":memory:",
+            dropSchema: true,
+            entities: [Todo],
+            synchronize: true,
+            logging: false
         })
-        const todo = await todoRepo.save(todoEntity)
-        expect(todo).to.be.instanceOf(Todo)
     })
 
-    it('getTodos lists todos', function () {
-        expect(myTodos.getTodos()).to.deep.equal([
-            'Buy eggs',
-            'Buy chicken',
-            'Feed chicken'
-        ])
+    afterEach(function () {
+        return getConnection().close()
     })
 
-    it('updateTodo updates a todo in the list', function () {
-        myTodos.updateTodo('Feed chicken', 'Eat chicken')
-        expect(myTodos.getTodos()).to.deep.equal([
-            'Buy eggs',
-            'Buy chicken',
-            'Eat chicken'
-        ])
+    it('create adds a todo', async function () {
+        const todoRepo = getRepository(Todo)
+        const myTodos = new Todos(todoRepo)
+        const body = 'test'
+        await myTodos.create(body)
+        const todo = await todoRepo.findOne({
+            where: { body }
+        })
+        expect(todo.body).to.be.equal(body)
     })
 
-    it('deleteTodo deletes a todo in the list', function () {
-        myTodos.deleteTodo('Buy chicken')
-        expect(myTodos.getTodos()).to.deep.equal([
-            'Buy eggs',
-            'Feed chicken'
-        ])
+    it('read lists todos', async function () {
+        const myTodos = new Todos(getRepository(Todo))
+        await myTodos.create('test')
+        const todos = await myTodos.read()
+        todos.map(todo => {
+            return expect(todo).to.be.instanceOf(Todo)
+        })
+    })
+
+    it('update updates a todo in the list', async function () {
+        const todoRepo = getRepository(Todo)
+        const myTodos = new Todos(todoRepo)
+        const oldBody = 'test'
+        const newBody = 'test1'
+        const oldTodo = todoRepo.create({body: oldBody})
+        console.log(oldTodo)
+        await myTodos.update(oldBody, newBody)
+        const newTodo = await todoRepo.findOne({
+            where: { body: newBody }
+        })
+        expect(oldTodo.body).to.not.be.equal(newTodo.body)
+        expect(newTodo.body).to.be.equal(newBody)
+    })
+
+    it('delete deletes a todo in the list', async function () {
+
     })
 })
